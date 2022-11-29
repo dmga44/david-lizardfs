@@ -92,6 +92,15 @@ static void release(FileInfo *fi) {
 }
 } // InodeTweaks
 
+namespace InodeDavid {
+static void release(FileInfo *fi) {
+	MagicFile *file = reinterpret_cast<MagicFile*>(fi->fh);
+	delete file;
+	oplog_printf("release (%lu) (internal node: DAVID_FILE): OK",
+	            (unsigned long int)inode_);
+}
+} // InodeDavid
+
 typedef void (*ReleaseFunc)(FileInfo *);
 static const std::array<ReleaseFunc, 16> funcs = {{
 	 &InodeStats::release,          //0x0U
@@ -108,7 +117,7 @@ static const std::array<ReleaseFunc, 16> funcs = {{
 	 nullptr,                       //0xCU
 	 nullptr,                       //0xDU
 	 nullptr,                       //0xEU
-	 nullptr,                       //0xEU
+	 &InodeDavid::release,          //0xEU
 	 &InodeMasterInfo::release      //0xFU
 }};
 

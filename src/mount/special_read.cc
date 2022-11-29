@@ -180,6 +180,22 @@ static std::vector<uint8_t> read(const Context &ctx,
 }
 } // InodeTweaks
 
+namespace InodeDavid {
+static std::vector<uint8_t> read(const Context &ctx,
+		size_t size, off_t off, FileInfo */*fi*/, int debug_mode) {
+	if (debug_mode) {
+		printDebugReadInfo(ctx, SPECIAL_INODE_DAVID, size, off);
+	}
+	david_flag^=true;
+	if(david_flag)
+	{
+		std::vector<uint8_t> my_hack={'m','y',' ','h','a','c','k','\n'};
+		return my_hack;
+	}
+	return std::vector<uint8_t>();
+}
+} // InodeDavid
+
 static const std::array<std::function<std::vector<uint8_t>
 	(const Context&, size_t, off_t, FileInfo*, int)>, 16> funcs = {{
 	 &InodeStats::read,             //0x0U
@@ -196,7 +212,7 @@ static const std::array<std::function<std::vector<uint8_t>
 	 nullptr,                       //0xCU
 	 nullptr,                       //0xDU
 	 nullptr,                       //0xEU
-	 nullptr,                       //0xEU
+	 &InodeDavid::read,             //0xEU
 	 &InodeMasterInfo::read         //0xFU
 }};
 

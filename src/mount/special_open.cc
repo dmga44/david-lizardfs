@@ -110,6 +110,17 @@ static void open(const Context &ctx, FileInfo *fi) {
 }
 } // InodeTweaks
 
+namespace InodeDavid {
+static void open(const Context &ctx, FileInfo *fi) {
+	MagicFile *file = new MagicFile;
+	fi->fh = reinterpret_cast<uintptr_t>(file);
+	fi->direct_io = 1;
+	fi->keep_cache = 0;
+	oplog_printf(ctx, "open (%lu) (internal node: DAVID_FILE): OK (1,0)",
+	            (unsigned long int)inode_);
+}
+} // InodeDavid
+
 static const std::array<std::function<void
 	(const Context&, FileInfo*)>, 16> funcs = {{
 	 &InodeStats::open,             //0x0U
@@ -126,7 +137,7 @@ static const std::array<std::function<void
 	 nullptr,                       //0xCU
 	 nullptr,                       //0xDU
 	 nullptr,                       //0xEU
-	 nullptr,                       //0xEU
+	 &InodeDavid::open,             //0xEU
 	 &InodeMasterInfo::open         //0xFU
 }};
 

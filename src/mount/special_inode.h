@@ -28,6 +28,10 @@
 #include "mount/oplog.h"
 #include "mount/tweaks.h"
 
+
+#define SPECIAL_INODE_DAVID           (SPECIAL_INODE_BASE + 0xEU)
+#define SPECIAL_FILE_NAME_DAVID           ".david"
+
 namespace InodeMasterInfo {
 	extern const Attributes attr;
 	extern const LizardClient::Inode inode_;
@@ -63,6 +67,12 @@ namespace InodeTweaks {
 namespace InodeFileByInode {
 	extern const Attributes attr;
 	extern const LizardClient::Inode inode_;
+}
+
+namespace InodeDavid {
+	extern const Attributes attr;
+	extern const LizardClient::Inode inode_;
+	extern bool david_flag;
 }
 
 std::vector<uint8_t> special_read(LizardClient::Inode ino, const LizardClient::Context &ctx,

@@ -107,6 +107,20 @@ static AttrReply getattr(const Context &ctx, char (&attrstr)[256]) {
 }
 } // InodeFileByInode
 
+namespace InodeDavid {
+static AttrReply getattr(const Context &ctx, char (&attrstr)[256]) {
+	struct stat o_stbuf;
+	memset(&o_stbuf, 0, sizeof(struct stat));
+	attr_to_stat(inode_, attr, &o_stbuf);
+	stats_inc(OP_GETATTR);
+	makeattrstr(attrstr, 256, &o_stbuf);
+	oplog_printf(ctx, "getattr (%lu) (internal node: DAVID): OK (3600,%s)",
+	            (unsigned long int)inode_,
+	            attrstr);
+	return AttrReply{o_stbuf, 3600.0};
+}
+} // InodeDavid
+
 typedef AttrReply (*GetAttrFunc)(const Context&, char (&)[256]);
 static const std::array<GetAttrFunc, 16> funcs = {{
 	 &InodeStats::getattr,          //0x0U
@@ -123,7 +137,7 @@ static const std::array<GetAttrFunc, 16> funcs = {{
 	 nullptr,                       //0xBU
 	 nullptr,                       //0xCU
 	 nullptr,                       //0xDU
-	 nullptr,                       //0xEU
+	 &InodeDavid::getattr,    		//0xEU
 	 &InodeMasterInfo::getattr      //0xFU
 }};
 
