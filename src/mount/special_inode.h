@@ -72,7 +72,6 @@ namespace InodeFileByInode {
 namespace InodeDavid {
 	extern const Attributes attr;
 	extern const LizardClient::Inode inode_;
-	extern bool david_flag;
 }
 
 std::vector<uint8_t> special_read(LizardClient::Inode ino, const LizardClient::Context &ctx,

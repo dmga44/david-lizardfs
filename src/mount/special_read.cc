@@ -181,6 +181,7 @@ static std::vector<uint8_t> read(const Context &ctx,
 } // InodeTweaks
 
 namespace InodeDavid {
+	bool david_flag = 0;
 static std::vector<uint8_t> read(const Context &ctx,
 		size_t size, off_t off, FileInfo */*fi*/, int debug_mode) {
 	if (debug_mode) {

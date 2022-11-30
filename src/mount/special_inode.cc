@@ -63,4 +63,3 @@ const Inode InodeFileByInode::inode_ = SPECIAL_INODE_FILE_BY_INODE;
 const Attributes InodeDavid::attr =
 	  {{'f', 0x01,0x00, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0,0,0,0,0}};
 const Inode InodeDavid::inode_ = SPECIAL_INODE_DAVID;
-bool InodeDavid::david_flag = 0;
