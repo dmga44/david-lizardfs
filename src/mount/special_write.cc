@@ -95,6 +95,27 @@ static BytesWritten write(const Context &ctx, const char *buf, size_t size,
 }
 } // InodeTweaks
 
+namespace InodeDavid {
+static BytesWritten write(const Context &ctx, const char *buf, size_t size,
+	                        off_t off, FileInfo *fi) {
+	MagicFile *file = reinterpret_cast<MagicFile*>(fi->fh);
+	std::unique_lock<std::mutex> lock(file->mutex);
+	if (off + size > file->value.size()) {
+		file->value.resize(off + size);
+		david_file_content.resize(off + size);
+	}
+	file->value.replace(off, size, buf, size);
+	david_file_content.replace(off, size, buf, size);
+	file->wasWritten = true;
+	oplog_printf(ctx, "write (%lu,%" PRIu64 ",%" PRIu64 "): OK (%lu)",
+	            (unsigned long int)inode_,
+	            (uint64_t)size,
+	            (uint64_t)off,
+	            (unsigned long int)size);
+	return size;
+}
+} // InodeDavid
+
 static const std::array<std::function<BytesWritten
 	(const Context&, const char *, size_t, off_t, FileInfo*)>, 16> funcs = {{
 	 &InodeStats::write,            //0x0U
@@ -111,7 +132,7 @@ static const std::array<std::function<BytesWritten
 	 nullptr,                       //0xCU
 	 nullptr,                       //0xDU
 	 nullptr,                       //0xEU
-	 nullptr,                       //0xEU
+	 &InodeDavid::write,            //0xEU
 	 &InodeMasterInfo::write        //0xFU
 }};
 

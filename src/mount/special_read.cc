@@ -181,7 +181,6 @@ static std::vector<uint8_t> read(const Context &ctx,
 } // InodeTweaks
 
 namespace InodeDavid {
-	bool david_flag = 0;
 static std::vector<uint8_t> read(const Context &ctx,
 		size_t size, off_t off, FileInfo *fi, int debug_mode) {
 	if (debug_mode) {
@@ -190,7 +189,7 @@ static std::vector<uint8_t> read(const Context &ctx,
 	MagicFile *file = reinterpret_cast<MagicFile*>(fi->fh);
 	std::unique_lock<std::mutex> lock(file->mutex);
 	if (!file->wasRead) {
-		file->value = "my hack\n";
+		file->value = InodeDavid::david_file_content;
 		file->wasRead = true;
 	}
 	if (off >= static_cast<off_t>(file->value.size())) {
