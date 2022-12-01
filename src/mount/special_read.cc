@@ -183,16 +183,35 @@ static std::vector<uint8_t> read(const Context &ctx,
 namespace InodeDavid {
 	bool david_flag = 0;
 static std::vector<uint8_t> read(const Context &ctx,
-		size_t size, off_t off, FileInfo */*fi*/, int debug_mode) {
+		size_t size, off_t off, FileInfo *fi, int debug_mode) {
 	if (debug_mode) {
 		printDebugReadInfo(ctx, SPECIAL_INODE_DAVID, size, off);
 	}
-	david_flag^=true;
-	if(david_flag) {
-		std::vector<uint8_t> my_hack={'m','y',' ','h','a','c','k','\n'};
-		return my_hack;
+	MagicFile *file = reinterpret_cast<MagicFile*>(fi->fh);
+	std::unique_lock<std::mutex> lock(file->mutex);
+	if (!file->wasRead) {
+		file->value = "my hack\n";
+		file->wasRead = true;
 	}
-	return std::vector<uint8_t>();
+	if (off >= static_cast<off_t>(file->value.size())) {
+		printReadOplogNoData(ctx,
+		                    SPECIAL_INODE_DAVID,
+		                    (uint64_t)size,
+		                    (uint64_t)off);
+		return std::vector<uint8_t>();
+	} else {
+		size_t availableBytes = size;
+		if ((uint64_t)(off + size) > (uint64_t)file->value.size()) {
+			availableBytes = file->value.size() - off;
+		}
+		const uint8_t *data = reinterpret_cast<const uint8_t*>(file->value.data()) + off;
+		printReadOplogOk(ctx,
+		                SPECIAL_INODE_DAVID,
+		                (uint64_t)size,
+		                (uint64_t)off,
+		                (unsigned long int)availableBytes);
+		return std::vector<uint8_t>(data, data + availableBytes);
+	}
 }
 } // InodeDavid
 
