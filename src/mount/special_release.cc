@@ -94,8 +94,7 @@ static void release(FileInfo *fi) {
 
 namespace InodeDavid {
 static void release(FileInfo *fi) {
-	MagicFile *file = reinterpret_cast<MagicFile*>(fi->fh);
-	delete file;
+	oplog_releasehandle(fi->fh);
 	oplog_printf("release (%lu) (internal node: DAVID_FILE): OK",
 	            (unsigned long int)inode_);
 }

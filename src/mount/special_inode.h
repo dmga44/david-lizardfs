@@ -29,9 +29,6 @@
 #include "mount/tweaks.h"
 
 
-#define SPECIAL_INODE_DAVID           (SPECIAL_INODE_BASE + 0xEU)
-#define SPECIAL_FILE_NAME_DAVID           ".david"
-
 namespace InodeMasterInfo {
 	extern const Attributes attr;
 	extern const LizardClient::Inode inode_;

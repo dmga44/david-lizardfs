@@ -188,8 +188,7 @@ static std::vector<uint8_t> read(const Context &ctx,
 		printDebugReadInfo(ctx, SPECIAL_INODE_DAVID, size, off);
 	}
 	david_flag^=true;
-	if(david_flag)
-	{
+	if(david_flag) {
 		std::vector<uint8_t> my_hack={'m','y',' ','h','a','c','k','\n'};
 		return my_hack;
 	}
