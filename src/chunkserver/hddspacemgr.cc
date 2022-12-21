@@ -3278,19 +3278,25 @@ void hdd_folder_scan_layout(folder *f, uint32_t begin_time, int layout_version) 
 		if (!dd) {
 			continue;
 		}
-
-		while (!scan_term) {
+		std::vector<std::string> dir_names;
+		while(1)
+		{
 			de = readdir(dd);
 			if (!de) {
 				break;
 			}
-
-			ChunkFilenameParser filenameParser(de->d_name);
+			dir_names.push_back(std::string(de->d_name));
+		}
+		for(std::string d_name : dir_names) {
+			if(scan_term)
+				break;
+				
+			ChunkFilenameParser filenameParser(d_name);
 			if (filenameParser.parse() != ChunkFilenameParser::Status::OK) {
-				if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..") != 0) {
+				if (strcmp(d_name.c_str(), ".") != 0 && strcmp(d_name.c_str(), "..") != 0) {
 					lzfs_pretty_syslog(LOG_WARNING,
 					                   "Invalid file %s placed in chunk directory %s; skipping it.",
-					                   de->d_name, subfolder_path.c_str());
+					                   d_name.c_str(), subfolder_path.c_str());
 				}
 				continue;
 			}
@@ -3298,12 +3304,12 @@ void hdd_folder_scan_layout(folder *f, uint32_t begin_time, int layout_version) 
 			    subfolder_number) {
 				lzfs_pretty_syslog(LOG_WARNING,
 				                   "Chunk %s%s placed in a wrong directory; skipping it.",
-				                   subfolder_path.c_str(), de->d_name);
+				                   subfolder_path.c_str(), d_name.c_str());
 				continue;
 			}
 
-			std::string chunk_name = de->d_name;
-			hdd_convert_chunk_to_ec2(subfolder_path, de->d_name, chunk_name);
+			std::string chunk_name = d_name;
+			hdd_convert_chunk_to_ec2(subfolder_path, d_name, chunk_name);
 
 			if(chunk_name.empty()) {
 				continue;
